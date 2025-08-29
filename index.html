@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wind Turbine Health Monitoring</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <h1>🌬️ TurbineHealthAI</h1>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#results">Results</a></li>
+                <li><a href="#technology">Technology</a></li>
+                <li><a href="#demo">Demo</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="hero-content">
+            <h2>AI-Powered Wind Turbine Failure Prediction</h2>
+            <p>100% Accurate Machine Learning System for Predictive Maintenance</p>
+            <button onclick="scrollToSection('results')">See Results</button>
+        </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section id="overview">
+        <div class="container">
+            <h2>Project Overview</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-wind"></i>
+                    <h3>9,000+ Data Points</h3>
+                    <p>Comprehensive turbine operational data analyzed</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-brain"></i>
+                    <h3>100% Accuracy</h3>
+                    <p>Perfect failure prediction using AI models</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-tools"></i>
+                    <h3>Predictive Maintenance</h3>
+                    <p>Identify issues before they cause downtime</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results">
+        <div class="container">
+            <h2>Impressive Results</h2>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h3>🎯 Perfect Prediction</h3>
+                    <p>Both models achieved 100% accuracy</p>
+                    <div class="metric">100%</div>
+                </div>
+                <div class="result-card">
+                    <h3>📊 Data Quality</h3>
+                    <p>Clean dataset with clear patterns</p>
+                    <div class="metric">9K Records</div>
+                </div>
+                <div class="result-card">
+                    <h3>⚡ Fast Detection</h3>
+                    <p>Real-time failure prediction</p>
+                    <div class="metric">< 1s</div>
+                </div>
+            </div>
+
+            <!-- Image Gallery -->
+            <div class="gallery">
+                <img src="C:\Users\mujah\OneDrive\Desktop\Turbine Health Monitoring\ws\images\confusionRF.png" alt="Confusion Matrix of Random Forest" onclick="openModal(this)">
+                <img src="C:\Users\mujah\OneDrive\Desktop\Turbine Health Monitoring\ws\images\conf_matrXGB.png" alt="Confusion Matrix of XGB" onclick="openModal(this)">
+                <img src="C:\Users\mujah\OneDrive\Desktop\Turbine Health Monitoring\ws\images\feature_impRF.png" alt="Feature Importance of Random Forest" onclick="openModal(this)">
+                <img src="C:\Users\mujah\OneDrive\Desktop\Turbine Health Monitoring\ws\images\feature_impXGB.png" alt="Feature Importance of XGB" onclick="openModal(this)">
+                <img src="C:\Users\mujah\OneDrive\Desktop\Turbine Health Monitoring\ws\images\featurevfailureboxplt.png" alt="Feature vs Failure" onclick="openModal(this)">
+                <img src="C:\Users\mujah\OneDrive\Desktop\Turbine Health Monitoring\ws\images\distoffaulttypes.png" alt="Distribution of Fault-Types" onclick="openModal(this)">
+                <img src="C:\Users\mujah\OneDrive\Desktop\Turbine Health Monitoring\ws\images\failure_dist.png" alt="Failure Distribution" onclick="openModal(this)">
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section id="technology">
+        <div class="container">
+            <h2>Technology Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <i class="fab fa-python"></i>
+                    <span>Python</span>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Machine Learning</span>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-network-wired"></i>
+                    <span>XGBoost</span>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-tree"></i>
+                    <span>Random Forest</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo">
+        <div class="container">
+            <h2>Live Demo</h2>
+            <div class="demo-container">
+                <div class="input-section">
+                    <h3>Test Your Turbine Data</h3>
+                    <div class="input-group">
+                        <label>Vibration Level:</label>
+                        <input type="range" id="vibration" min="0.5" max="1.5" step="0.1" value="1.0">
+                        <span id="vibration-value">1.0</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Temperature (°C):</label>
+                        <input type="range" id="temperature" min="70" max="100" value="85">
+                        <span id="temperature-value">85°C</span>
+                    </div>
+                    <button onclick="predictFailure()">Predict Failure Risk</button>
+                </div>
+                <div class="output-section">
+                    <div id="prediction-result">
+                        <h3>Prediction Result</h3>
+                        <div id="risk-meter">
+                            <div class="risk-bar"></div>
+                        </div>
+                        <p id="prediction-text">Enter data to get prediction</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>Wind Turbine Health Monitoring System | Machine Learning Project</p>
+    </footer>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
