@@ -264,33 +264,41 @@
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1.5rem;
             margin-top: 3rem;
-        }
+            }   
         
         .gallery-item {
-            position: relative;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s;
-            height: 220px;
             cursor: pointer;
-        }
-        
+            /* REMOVE fixed height */
+            height: auto;
+            /* ADD aspect ratio or min-height instead */
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(31, 41, 55, 0.6);
+            position: relative;
+            }
+
         .gallery-item:hover {
             transform: translateY(-5px);
-        }
-        
+            }
+
         .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto; /* CHANGE from fixed height to auto */
+            max-height: 400px; /* ADD maximum height */
+            object-fit: contain; /* CHANGE from cover to contain */
             transition: transform 0.5s;
-        }
-        
+            width: 100%;
+            }
+
         .gallery-item:hover img {
-            transform: scale(1.05);
-        }
-        
+            transform: scale(1.03);
+            }
+
         .gallery-caption {
             position: absolute;
             bottom: 0;
@@ -301,11 +309,11 @@
             color: white;
             transform: translateY(100%);
             transition: transform 0.3s;
-        }
-        
+            }
+
         .gallery-item:hover .gallery-caption {
             transform: translateY(0);
-        }
+            }
         
         /* Technology Section */
         .tech-grid {
@@ -535,7 +543,7 @@
         <div class="nav-container">
             <div class="logo">
                 <i class="fas fa-fan"></i>
-                <span>TurbineHealthAI</span>
+                <span>TurbineHealth-Monitoring</span>
             </div>
             <ul>
                 <li><a href="#overview">Overview</a></li>
@@ -550,7 +558,7 @@
     <section id="hero">
         <div class="container">
             <div class="hero-content">
-                <h2 class="animate">AI-Powered Wind Turbine Failure Prediction</h2>
+                <h2 class="animate">Wind Turbine Failure Prediction</h2>
                 <p class="animate delay-1">100% Accurate Machine Learning System for Predictive Maintenance</p>
                 <button class="cta-button animate delay-2" onclick="scrollToSection('results')">See Results</button>
             </div>
@@ -710,8 +718,8 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>Wind Turbine Health Monitoring System | Advanced Machine Learning Project</p>
-            <p>© 2023 TurbineHealthAI. All rights reserved.</p>
+            <p>Wind Turbine Health Monitoring System | ExcellenC DS Project</p>
+            <p>© TurbineHealth-Monitoring. Mujahed.</p>
         </div>
     </footer>
 
