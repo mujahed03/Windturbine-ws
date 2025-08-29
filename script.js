@@ -18,28 +18,38 @@ document.getElementById('rotorSpeed').addEventListener('input', function() {
     document.getElementById('rotorSpeed-value').textContent = this.value + ' RPM';
 });
 
-// Enhanced prediction function based on your ML findings
+// Enhanced prediction function based on your actual ML model findings
 function predictFailure() {
     const vibration = parseFloat(document.getElementById('vibration').value);
     const temperature = parseFloat(document.getElementById('temperature').value);
     const rotorSpeed = parseFloat(document.getElementById('rotorSpeed').value);
     
-    // Enhanced logic based on your ML model insights
+    // BASED ON YOUR ACTUAL ML MODEL FINDINGS:
+    // Vibration is the MOST important feature (40-50% importance)
+    // Temperature is second most important (20-30% importance)
+    // Rotor speed has lower importance (5-10% importance)
+    
     let riskPercentage = 0;
     
-    // Vibration contributes significantly (based on your feature importance)
-    if (vibration > 1.3) riskPercentage += 50;
-    else if (vibration > 1.1) riskPercentage += 30;
-    else if (vibration > 0.9) riskPercentage += 10;
+    // Vibration contribution (40-50% weight - MOST IMPORTANT)
+    if (vibration > 1.4) riskPercentage += 65; // Critical vibration
+    else if (vibration > 1.2) riskPercentage += 45; // High vibration
+    else if (vibration > 1.0) riskPercentage += 20; // Moderate vibration
+    else if (vibration > 0.8) riskPercentage += 5;  // Normal vibration
     
-    // Temperature contribution
-    if (temperature > 95) riskPercentage += 40;
-    else if (temperature > 85) riskPercentage += 20;
+    // Temperature contribution (20-30% weight)
+    if (temperature > 95) riskPercentage += 50;     // Critical temperature
+    else if (temperature > 90) riskPercentage += 30; // High temperature
+    else if (temperature > 85) riskPercentage += 15; // Elevated temperature
+    else if (temperature > 80) riskPercentage += 5;  // Normal temperature
     
-    // Rotor speed deviation from optimal (15 RPM)
+    // Rotor speed contribution (5-10% weight - LEAST IMPORTANT)
     const speedDeviation = Math.abs(rotorSpeed - 15);
-    riskPercentage += speedDeviation * 3;
+    if (speedDeviation > 4) riskPercentage += 20;   // Extreme deviation
+    else if (speedDeviation > 2) riskPercentage += 10; // Significant deviation
+    else if (speedDeviation > 1) riskPercentage += 5;  // Minor deviation
     
+    // Cap at 100%
     riskPercentage = Math.min(riskPercentage, 100);
     
     // Update UI
@@ -48,19 +58,35 @@ function predictFailure() {
     let predictionText = '';
     let riskLevel = '';
     
-    if (riskPercentage < 25) {
-        predictionText = 'Turbine operating normally. No maintenance needed.';
+    if (riskPercentage < 20) {
+        predictionText = 'All parameters normal. No maintenance needed.';
         riskLevel = 'LOW RISK';
-    } else if (riskPercentage < 60) {
-        predictionText = 'Moderate anomalies detected. Schedule inspection within 2 weeks.';
-        riskLevel = 'MEDIUM RISK';
-    } else {
-        predictionText = 'Critical failure likely! Immediate maintenance required.';
+    } else if (riskPercentage < 50) {
+        predictionText = 'Minor anomalies detected. Monitor and schedule routine check.';
+        riskLevel = 'MODERATE RISK';
+    } else if (riskPercentage < 80) {
+        predictionText = 'Significant issues detected! Schedule inspection within 48 hours.';
         riskLevel = 'HIGH RISK';
+    } else {
+        predictionText = 'CRITICAL FAILURE IMMINENT! Shutdown and perform immediate maintenance!';
+        riskLevel = 'CRITICAL RISK';
     }
     
     document.getElementById('prediction-text').innerHTML = 
-        `<strong>${riskLevel}</strong><br>${predictionText}`;
+        `<strong style="font-size: 1.3em;">${riskLevel}</strong><br>${predictionText}<br>
+         <small>Risk Score: ${Math.round(riskPercentage)}%</small>`;
+    
+    // Visual feedback based on risk level
+    const riskMeter = document.querySelector('.risk-bar');
+    if (riskPercentage >= 80) {
+        riskMeter.style.background = 'linear-gradient(90deg, #EF4444, #DC2626)';
+    } else if (riskPercentage >= 50) {
+        riskMeter.style.background = 'linear-gradient(90deg, #F59E0B, #EA580C)';
+    } else if (riskPercentage >= 20) {
+        riskMeter.style.background = 'linear-gradient(90deg, #84CC16, #65A30D)';
+    } else {
+        riskMeter.style.background = 'linear-gradient(90deg, #10B981, #059669)';
+    }
 }
 
 // Image modal functionality
