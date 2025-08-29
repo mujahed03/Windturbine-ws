@@ -4,14 +4,539 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wind Turbine Health Monitoring</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563EB;
+            --primary-dark: #1E40AF;
+            --secondary: #10B981;
+            --dark: #1F2937;
+            --darker: #111827;
+            --light: #F3F4F6;
+            --accent: #F59E0B;
+            --gradient-start: #2563EB;
+            --gradient-end: #7C3AED;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--light);
+            background: linear-gradient(to bottom, var(--darker), var(--dark));
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation */
+        nav {
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .logo i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+        
+        nav ul li a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s;
+        }
+        
+        nav ul li a:hover:after {
+            width: 100%;
+        }
+        
+        nav ul li a:hover {
+            color: var(--primary);
+        }
+        
+        /* Hero Section */
+        #hero {
+            padding: 160px 20px 100px;
+            text-align: center;
+            background: linear-gradient(to bottom, rgba(37, 99, 235, 0.2), transparent),
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23111827" fill-opacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,202.7C672,203,768,181,864,160C960,139,1056,117,1152,117.3C1248,117,1344,139,1392,149.3L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path></svg>') bottom no-repeat;
+            background-size: 100% auto;
+        }
+        
+        .hero-content h2 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+        
+        .hero-content p {
+            font-size: 1.5rem;
+            margin-bottom: 2.5rem;
+            color: var(--light);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-button {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+        }
+        
+        /* Sections */
+        section {
+            padding: 100px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 3rem;
+            color: white;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
+        }
+        
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background: linear-gradient(145deg, rgba(31, 41, 55, 0.8), rgba(17, 24, 39, 0.8));
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+        
+        .feature-card i {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .feature-card p {
+            color: #D1D5DB;
+        }
+        
+        /* Results Section */
+        #results {
+            background: linear-gradient(to bottom, var(--dark), var(--darker));
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        
+        .result-card {
+            background: linear-gradient(145deg, rgba(31, 41, 55, 0.8), rgba(17, 24, 39, 0.8));
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .result-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .metric {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-top: 1rem;
+            text-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+        }
+        
+        /* Gallery */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+        
+        .gallery-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+            height: 220px;
+            cursor: pointer;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 1rem;
+            color: white;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        
+        .gallery-item:hover .gallery-caption {
+            transform: translateY(0);
+        }
+        
+        /* Technology Section */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 2rem;
+        }
+        
+        .tech-item {
+            background: linear-gradient(145deg, rgba(31, 41, 55, 0.8), rgba(17, 24, 39, 0.8));
+            padding: 2rem 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tech-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .tech-item i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .tech-item span {
+            font-weight: 600;
+            color: white;
+        }
+        
+        /* Demo Section */
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            background: linear-gradient(145deg, rgba(31, 41, 55, 0.8), rgba(17, 24, 39, 0.8));
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .input-group {
+            margin-bottom: 2rem;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(17, 24, 39, 0.6);
+            color: white;
+        }
+        
+        .demo-button {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+        }
+        
+        .output-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        #prediction-result {
+            text-align: center;
+        }
+        
+        #prediction-result h3 {
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+        
+        #risk-meter {
+            background: rgba(17, 24, 39, 0.6);
+            height: 35px;
+            border-radius: 18px;
+            margin: 2rem 0;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .risk-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10B981, #F59E0B, #EF4444);
+            width: 0%;
+            transition: width 1s;
+            border-radius: 18px;
+        }
+        
+        #prediction-text {
+            font-size: 1.2rem;
+            color: white;
+            font-weight: 500;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--darker);
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            padding-top: 60px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 900px;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(37, 99, 235, 0.3);
+        }
+        
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close:hover {
+            color: var(--primary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .demo-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-content h2 {
+                font-size: 2.8rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+            
+            .hero-content h2 {
+                font-size: 2.2rem;
+            }
+            
+            .hero-content p {
+                font-size: 1.2rem;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .features-grid,
+            .results-grid,
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate {
+            animation: fadeIn 1s ease-out forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
-            <h1>🌬️ TurbineHealthAI</h1>
+            <div class="logo">
+                <i class="fas fa-fan"></i>
+                <span>TurbineHealthAI</span>
+            </div>
             <ul>
                 <li><a href="#overview">Overview</a></li>
                 <li><a href="#results">Results</a></li>
@@ -23,32 +548,34 @@
 
     <!-- Hero Section -->
     <section id="hero">
-        <div class="hero-content">
-            <h2>AI-Powered Wind Turbine Failure Prediction</h2>
-            <p>100% Accurate Machine Learning System for Predictive Maintenance</p>
-            <button onclick="scrollToSection('results')">See Results</button>
+        <div class="container">
+            <div class="hero-content">
+                <h2 class="animate">AI-Powered Wind Turbine Failure Prediction</h2>
+                <p class="animate delay-1">100% Accurate Machine Learning System for Predictive Maintenance</p>
+                <button class="cta-button animate delay-2" onclick="scrollToSection('results')">See Results</button>
+            </div>
         </div>
     </section>
 
     <!-- Overview Section -->
     <section id="overview">
         <div class="container">
-            <h2>Project Overview</h2>
+            <h2 class="section-title">Project Overview</h2>
             <div class="features-grid">
-                <div class="feature-card">
-                    <i class="fas fa-wind"></i>
+                <div class="feature-card animate">
+                    <i class="fas fa-database"></i>
                     <h3>9,000+ Data Points</h3>
-                    <p>Comprehensive turbine operational data analyzed</p>
+                    <p>Comprehensive turbine operational data analyzed with advanced ML algorithms</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card animate delay-1">
                     <i class="fas fa-brain"></i>
                     <h3>100% Accuracy</h3>
-                    <p>Perfect failure prediction using AI models</p>
+                    <p>Perfect failure prediction using ensemble learning models</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card animate delay-2">
                     <i class="fas fa-tools"></i>
                     <h3>Predictive Maintenance</h3>
-                    <p>Identify issues before they cause downtime</p>
+                    <p>Identify issues before they cause downtime and reduce maintenance costs</p>
                 </div>
             </div>
         </div>
@@ -57,7 +584,7 @@
     <!-- Results Section -->
     <section id="results">
         <div class="container">
-            <h2>Impressive Results</h2>
+            <h2 class="section-title">Impressive Results</h2>
             <div class="results-grid">
                 <div class="result-card">
                     <h3>🎯 Perfect Prediction</h3>
@@ -78,13 +605,34 @@
 
             <!-- Image Gallery -->
             <div class="gallery">
-                <img src="images/confusionRF.png" alt="Confusion Matrix of Random Forest" onclick="openModal(this)">
-                <img src="images/conf_matrXGB.png" alt="Confusion Matrix of XGB" onclick="openModal(this)">
-                <img src="images/feature_impRF.png" alt="Feature Importance of Random Forest" onclick="openModal(this)">
-                <img src="images/feature_impXGB.png" alt="Feature Importance of XGB" onclick="openModal(this)">
-                <img src="images/featurevfailureboxplt.png" alt="Feature vs Failure" onclick="openModal(this)">
-                <img src="images/distoffaulttypes.png" alt="Distribution of Fault-Types" onclick="openModal(this)">
-                <img src="images/failure_dist.png" alt="Failure Distribution" onclick="openModal(this)">
+                <div class="gallery-item">
+                    <img src="images/confusionRF.png" alt="Confusion Matrix of Random Forest">
+                    <div class="gallery-caption">Random Forest Confusion Matrix</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/conf_matrXGB.png" alt="Confusion Matrix of XGB">
+                    <div class="gallery-caption">XGBoost Confusion Matrix</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/feature_impRF.png" alt="Feature Importance of Random Forest">
+                    <div class="gallery-caption">Random Forest Feature Importance</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/feature_impXGB.png" alt="Feature Importance of XGB">
+                    <div class="gallery-caption">XGBoost Feature Importance</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/featurevfailureboxplt.png" alt="Feature vs Failure">
+                    <div class="gallery-caption">Feature vs Failure Analysis</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/distoffaulttypes.png" alt="Distribution of Fault-Types">
+                    <div class="gallery-caption">Fault Type Distribution</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/failure_dist.png" alt="Failure Distribution">
+                    <div class="gallery-caption">Failure Distribution</div>
+                </div>
             </div>
         </div>
     </section>
@@ -92,7 +640,7 @@
     <!-- Technology Section -->
     <section id="technology">
         <div class="container">
-            <h2>Technology Stack</h2>
+            <h2 class="section-title">Technology Stack</h2>
             <div class="tech-grid">
                 <div class="tech-item">
                     <i class="fab fa-python"></i>
@@ -110,6 +658,14 @@
                     <i class="fas fa-tree"></i>
                     <span>Random Forest</span>
                 </div>
+                <div class="tech-item">
+                    <i class="fas fa-wave-square"></i>
+                    <span>TensorFlow</span>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Data Analysis</span>
+                </div>
             </div>
         </div>
     </section>
@@ -117,7 +673,7 @@
     <!-- Demo Section -->
     <section id="demo">
         <div class="container">
-            <h2>Live Demo</h2>
+            <h2 class="section-title">Live Demo</h2>
             <div class="demo-container">
                 <div class="input-section">
                     <h3>Test Your Turbine Data</h3>
@@ -131,7 +687,12 @@
                         <input type="range" id="temperature" min="70" max="100" value="85">
                         <span id="temperature-value">85°C</span>
                     </div>
-                    <button onclick="predictFailure()">Predict Failure Risk</button>
+                    <div class="input-group">
+                        <label>Rotor Speed (RPM):</label>
+                        <input type="range" id="rotorSpeed" min="10" max="20" value="15">
+                        <span id="rotorSpeed-value">15 RPM</span>
+                    </div>
+                    <button class="demo-button" onclick="predictFailure()">Predict Failure Risk</button>
                 </div>
                 <div class="output-section">
                     <div id="prediction-result">
@@ -148,7 +709,10 @@
 
     <!-- Footer -->
     <footer>
-        <p>Wind Turbine Health Monitoring System | Machine Learning Project</p>
+        <div class="container">
+            <p>Wind Turbine Health Monitoring System | Advanced Machine Learning Project</p>
+            <p>© 2023 TurbineHealthAI. All rights reserved.</p>
+        </div>
     </footer>
 
     <!-- Image Modal -->
@@ -157,6 +721,87 @@
         <img class="modal-content" id="modalImage">
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Function to scroll to a section
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Function to open modal with clicked image
+        function openModal(element) {
+            const modal = document.getElementById("imageModal");
+            const modalImg = document.getElementById("modalImage");
+            modal.style.display = "block";
+            modalImg.src = element.src;
+        }
+        
+        // Function to close modal
+        function closeModal() {
+            document.getElementById("imageModal").style.display = "none";
+        }
+        
+        // Update slider values
+        document.getElementById('vibration').addEventListener('input', function() {
+            document.getElementById('vibration-value').textContent = this.value;
+        });
+        
+        document.getElementById('temperature').addEventListener('input', function() {
+            document.getElementById('temperature-value').textContent = this.value + '°C';
+        });
+        
+        document.getElementById('rotorSpeed').addEventListener('input', function() {
+            document.getElementById('rotorSpeed-value').textContent = this.value + ' RPM';
+        });
+        
+        // Simple failure prediction function
+        function predictFailure() {
+            const vibration = parseFloat(document.getElementById('vibration').value);
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const rotorSpeed = parseFloat(document.getElementById('rotorSpeed').value);
+            
+            // Simple algorithm for demonstration
+            let risk = 0;
+            risk += (vibration - 0.5) * 20; // Vibration contributes to risk
+            risk += (temperature - 70) * 0.5; // Temperature contributes to risk
+            risk += Math.abs(rotorSpeed - 15) * 5; // Deviation from optimal speed increases risk
+            
+            // Cap risk between 0 and 100
+            risk = Math.max(0, Math.min(100, risk));
+            
+            // Update risk meter
+            document.querySelector('.risk-bar').style.width = risk + '%';
+            
+            // Update prediction text
+            const predictionText = document.getElementById('prediction-text');
+            if (risk < 30) {
+                predictionText.innerHTML = '<span style="color:#10B981">LOW RISK</span><br>No maintenance needed';
+            } else if (risk < 70) {
+                predictionText.innerHTML = '<span style="color:#F59E0B">MEDIUM RISK</span><br>Schedule inspection soon';
+            } else {
+                predictionText.innerHTML = '<span style="color:#EF4444">HIGH RISK</span><br>Immediate maintenance required';
+            }
+        }
+        
+        // Add animations when scrolling
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.animate');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            animatedElements.forEach(element => {
+                element.style.opacity = 0;
+                element.style.transform = 'translateY(20px)';
+                element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(element);
+            });
+        });
+    </script>
 </body>
 </html>
