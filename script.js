@@ -24,67 +24,72 @@ function predictFailure() {
     const temperature = parseFloat(document.getElementById('temperature').value);
     const rotorSpeed = parseFloat(document.getElementById('rotorSpeed').value);
     
-    // Simple calculation that WILL produce all risk levels
-    // Vibration: 0.5-1.5 -> map to 0-50%
-    // Temperature: 70-100 -> map to 0-30% 
-    // Rotor Speed: 10-20 -> map to 0-20% (deviation from 15)
-    
     let riskPercentage = 0;
-    
-    // Vibration contributes 50% max (most important)
-    riskPercentage += ((vibration - 0.5) / 1.0) * 50;
-    
-    // Temperature contributes 30% max
-    riskPercentage += ((temperature - 70) / 30) * 30;
-    
-    // Rotor speed deviation contributes 20% max
+
+    // --- Vibration contribution (0.5–1.5) ---
+    if (vibration >= 1.4) riskPercentage += 40;   // Critical
+    else if (vibration >= 1.2) riskPercentage += 30; // High
+    else if (vibration >= 1.0) riskPercentage += 20; // Moderate
+    else if (vibration >= 0.8) riskPercentage += 10; // Low
+    else riskPercentage += 5;
+
+    // --- Temperature contribution (70–100) ---
+    if (temperature >= 98) riskPercentage += 35;   // Critical
+    else if (temperature >= 95) riskPercentage += 25; // High
+    else if (temperature >= 90) riskPercentage += 15; // Moderate
+    else if (temperature >= 85) riskPercentage += 8;  // Low
+    else riskPercentage += 5;
+
+    // --- Rotor speed contribution (10–20, optimal = 15) ---
     const speedDeviation = Math.abs(rotorSpeed - 15);
-    riskPercentage += (speedDeviation / 5) * 20;
-    
-    // Cap at 100%
+    if (speedDeviation >= 4) riskPercentage += 25;  // Extreme
+    else if (speedDeviation >= 2) riskPercentage += 15; // High
+    else if (speedDeviation >= 1) riskPercentage += 8;  // Moderate
+    else riskPercentage += 3;
+
+    // Cap at 100
     riskPercentage = Math.min(riskPercentage, 100);
-    
-    // Update UI
-    document.querySelector('.risk-bar').style.width = riskPercentage + '%';
-    
+
+    // --- Risk level classification ---
     let predictionText = '';
     let riskLevel = '';
-    
-    // Clear risk levels
-    if (riskPercentage < 25) {
+
+    if (riskPercentage < 35) {
         predictionText = 'All parameters normal. No maintenance needed.';
         riskLevel = 'LOW RISK';
-    } else if (riskPercentage < 50) {
+    } else if (riskPercentage < 65) {
         predictionText = 'Minor anomalies detected. Monitor and schedule routine check.';
         riskLevel = 'MODERATE RISK';
-    } else if (riskPercentage < 75) {
+    } else if (riskPercentage < 85) {
         predictionText = 'Significant issues detected! Schedule inspection within 48 hours.';
         riskLevel = 'HIGH RISK';
     } else {
         predictionText = 'CRITICAL FAILURE IMMINENT! Shutdown and perform immediate maintenance!';
         riskLevel = 'CRITICAL RISK';
     }
-    
+
+    // --- UI update ---
+    document.querySelector('.risk-bar').style.width = riskPercentage + '%';
     document.getElementById('prediction-text').innerHTML = 
         `<strong style="font-size: 1.3em;">${riskLevel}</strong><br>${predictionText}<br>
          <small>Risk Score: ${Math.round(riskPercentage)}%</small>`;
-    
-    // Visual feedback based on risk level
+
+    // Risk bar color
     const riskMeter = document.querySelector('.risk-bar');
-    if (riskPercentage >= 75) {
+    if (riskPercentage >= 85) {
         riskMeter.style.background = 'linear-gradient(90deg, #EF4444, #DC2626)';
         document.getElementById('prediction-text').style.color = '#EF4444';
-    } else if (riskPercentage >= 50) {
+    } else if (riskPercentage >= 65) {
         riskMeter.style.background = 'linear-gradient(90deg, #F59E0B, #EA580C)';
         document.getElementById('prediction-text').style.color = '#F59E0B';
-    } else if (riskPercentage >= 25) {
+    } else if (riskPercentage >= 35) {
         riskMeter.style.background = 'linear-gradient(90deg, #84CC16, #65A30D)';
         document.getElementById('prediction-text').style.color = '#84CC16';
     } else {
         riskMeter.style.background = 'linear-gradient(90deg, #10B981, #059669)';
         document.getElementById('prediction-text').style.color = '#10B981';
     }
-    
+
     console.log(`Vibration: ${vibration}, Temp: ${temperature}, RPM: ${rotorSpeed}, Risk: ${riskPercentage}%`);
 }
 
