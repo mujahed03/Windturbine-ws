@@ -537,6 +537,26 @@
         .delay-3 { animation-delay: 0.6s; }
     </style>
 </head>
+<script>
+// EMERGENCY FALLBACK CODE
+console.log("Emergency fallback code loaded!");
+
+function predictFailure() {
+    console.log("Emergency predict function called!");
+    document.querySelector('.risk-bar').style.width = '100%';
+    document.querySelector('.risk-bar').style.background = 'red';
+    document.getElementById('prediction-text').innerHTML = 
+        '<strong style="color: red; font-size: 1.3em;">CRITICAL RISK</strong><br>' +
+        '🚨 EMERGENCY: Immediate shutdown required!<br>' +
+        '<small>Risk Score: 100%</small>';
+}
+
+// Force test on load
+setTimeout(function() {
+    console.log("Auto-testing...");
+    predictFailure();
+}, 1000);
+</script>
 <body>
     <!-- Navigation -->
     <nav>
