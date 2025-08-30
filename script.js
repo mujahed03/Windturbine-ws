@@ -18,34 +18,28 @@ document.getElementById('rotorSpeed').addEventListener('input', function() {
     document.getElementById('rotorSpeed-value').textContent = this.value + ' RPM';
 });
 
-// FIXED prediction function - adjusted for your slider ranges
+// SIMPLIFIED and GUARANTEED prediction function
 function predictFailure() {
     const vibration = parseFloat(document.getElementById('vibration').value);
     const temperature = parseFloat(document.getElementById('temperature').value);
     const rotorSpeed = parseFloat(document.getElementById('rotorSpeed').value);
     
+    // Simple calculation that WILL produce all risk levels
+    // Vibration: 0.5-1.5 -> map to 0-50%
+    // Temperature: 70-100 -> map to 0-30% 
+    // Rotor Speed: 10-20 -> map to 0-20% (deviation from 15)
+    
     let riskPercentage = 0;
     
-    // Vibration contribution (0.5 to 1.5 range)
-    if (vibration >= 1.4) riskPercentage += 70; // Critical: 1.4-1.5
-    else if (vibration >= 1.2) riskPercentage += 50; // High: 1.2-1.39
-    else if (vibration >= 1.0) riskPercentage += 30; // Moderate: 1.0-1.19
-    else if (vibration >= 0.8) riskPercentage += 15; // Normal: 0.8-0.99
-    else riskPercentage += 5; // Low: 0.5-0.79
+    // Vibration contributes 50% max (most important)
+    riskPercentage += ((vibration - 0.5) / 1.0) * 50;
     
-    // Temperature contribution (70 to 100 range)
-    if (temperature >= 98) riskPercentage += 60; // Critical: 98-100
-    else if (temperature >= 95) riskPercentage += 45; // High: 95-97
-    else if (temperature >= 90) riskPercentage += 30; // Moderate: 90-94
-    else if (temperature >= 85) riskPercentage += 15; // Normal: 85-89
-    else riskPercentage += 5; // Low: 70-84
+    // Temperature contributes 30% max
+    riskPercentage += ((temperature - 70) / 30) * 30;
     
-    // Rotor speed contribution (10 to 20 range, optimal at 15)
+    // Rotor speed deviation contributes 20% max
     const speedDeviation = Math.abs(rotorSpeed - 15);
-    if (speedDeviation >= 4) riskPercentage += 25; // Extreme: ≥4 deviation
-    else if (speedDeviation >= 2) riskPercentage += 15; // High: 2-3.9
-    else if (speedDeviation >= 1) riskPercentage += 8; // Moderate: 1-1.9
-    else riskPercentage += 3; // Low: <1
+    riskPercentage += (speedDeviation / 5) * 20;
     
     // Cap at 100%
     riskPercentage = Math.min(riskPercentage, 100);
@@ -56,14 +50,14 @@ function predictFailure() {
     let predictionText = '';
     let riskLevel = '';
     
-    // Adjusted thresholds for better distribution
-    if (riskPercentage < 35) {
+    // Clear risk levels
+    if (riskPercentage < 25) {
         predictionText = 'All parameters normal. No maintenance needed.';
         riskLevel = 'LOW RISK';
-    } else if (riskPercentage < 65) {
+    } else if (riskPercentage < 50) {
         predictionText = 'Minor anomalies detected. Monitor and schedule routine check.';
         riskLevel = 'MODERATE RISK';
-    } else if (riskPercentage < 85) {
+    } else if (riskPercentage < 75) {
         predictionText = 'Significant issues detected! Schedule inspection within 48 hours.';
         riskLevel = 'HIGH RISK';
     } else {
@@ -77,13 +71,13 @@ function predictFailure() {
     
     // Visual feedback based on risk level
     const riskMeter = document.querySelector('.risk-bar');
-    if (riskPercentage >= 85) {
+    if (riskPercentage >= 75) {
         riskMeter.style.background = 'linear-gradient(90deg, #EF4444, #DC2626)';
         document.getElementById('prediction-text').style.color = '#EF4444';
-    } else if (riskPercentage >= 65) {
+    } else if (riskPercentage >= 50) {
         riskMeter.style.background = 'linear-gradient(90deg, #F59E0B, #EA580C)';
         document.getElementById('prediction-text').style.color = '#F59E0B';
-    } else if (riskPercentage >= 35) {
+    } else if (riskPercentage >= 25) {
         riskMeter.style.background = 'linear-gradient(90deg, #84CC16, #65A30D)';
         document.getElementById('prediction-text').style.color = '#84CC16';
     } else {
