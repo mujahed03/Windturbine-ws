@@ -18,36 +18,68 @@ document.getElementById('rotorSpeed').addEventListener('input', function() {
     document.getElementById('rotorSpeed-value').textContent = this.value + ' RPM';
 });
 
-// ---- FIXED prediction function ----
-// Simple failure prediction function (scaled properly)
+// GUARANTEED WORKING prediction function
 function predictFailure() {
     const vibration = parseFloat(document.getElementById('vibration').value);
     const temperature = parseFloat(document.getElementById('temperature').value);
     const rotorSpeed = parseFloat(document.getElementById('rotorSpeed').value);
-
-    // Adjusted scoring so full range is possible
-    let risk = 0;
-    risk += (vibration - 0.5) * 40;        // vibration has stronger weight
-    risk += (temperature - 70) * 1.2;      // temperature influence increased
-    risk += Math.abs(rotorSpeed - 15) * 8; // penalty for deviating from 15 RPM
-
-    // Cap risk between 0 and 100
-    risk = Math.max(0, Math.min(100, risk));
-
-    // Update risk bar
-    document.querySelector('.risk-bar').style.width = risk + '%';
-
-    // Update prediction text
-    const predictionText = document.getElementById('prediction-text');
-    if (risk < 30) {
-        predictionText.innerHTML = '<span style="color:#10B981">LOW RISK</span><br>No maintenance needed';
-    } else if (risk < 70) {
-        predictionText.innerHTML = '<span style="color:#F59E0B">MEDIUM RISK</span><br>Schedule inspection soon';
-    } else {
-        predictionText.innerHTML = '<span style="color:#EF4444">HIGH RISK</span><br>Immediate maintenance required';
+    
+    // SIMPLE DIRECT MAPPING - This will definitely work
+    let riskPercentage = 0;
+    
+    // Vibration: 0.5-1.5 → 0-40%
+    riskPercentage += ((vibration - 0.5) / 1.0) * 40;
+    
+    // Temperature: 70-100 → 0-35%
+    riskPercentage += ((temperature - 70) / 30) * 35;
+    
+    // Rotor Speed deviation: 0-5 → 0-25%
+    const speedDeviation = Math.abs(rotorSpeed - 15);
+    riskPercentage += (speedDeviation / 5) * 25;
+    
+    // Ensure we don't exceed 100%
+    riskPercentage = Math.min(100, Math.max(0, riskPercentage));
+    
+    // Update the risk meter
+    document.querySelector('.risk-bar').style.width = riskPercentage + '%';
+    
+    // Determine risk level with clear thresholds
+    let riskLevel, predictionText;
+    
+    if (riskPercentage >= 80) {
+        riskLevel = 'CRITICAL RISK';
+        predictionText = '🚨 CRITICAL FAILURE IMMINENT! Immediate shutdown required!';
+        document.querySelector('.risk-bar').style.background = 'linear-gradient(90deg, #DC2626, #B91C1C)';
+        document.getElementById('prediction-text').style.color = '#DC2626';
+    } 
+    else if (riskPercentage >= 55) {
+        riskLevel = 'HIGH RISK';
+        predictionText = '⚠️ HIGH RISK! Schedule maintenance within 24 hours!';
+        document.querySelector('.risk-bar').style.background = 'linear-gradient(90deg, #EA580C, #C2410C)';
+        document.getElementById('prediction-text').style.color = '#EA580C';
     }
-
-    console.log("Calculated Risk:", risk); // Debugging
+    else if (riskPercentage >= 30) {
+        riskLevel = 'MODERATE RISK';
+        predictionText = 'ℹ️ Moderate issues detected. Schedule inspection soon.';
+        document.querySelector('.risk-bar').style.background = 'linear-gradient(90deg, #F59E0B, #D97706)';
+        document.getElementById('prediction-text').style.color = '#F59E0B';
+    }
+    else {
+        riskLevel = 'LOW RISK';
+        predictionText = '✅ All systems normal. No action required.';
+        document.querySelector('.risk-bar').style.background = 'linear-gradient(90deg, #10B981, #059669)';
+        document.getElementById('prediction-text').style.color = '#10B981';
+    }
+    
+    // Update the prediction text
+    document.getElementById('prediction-text').innerHTML = 
+        `<strong style="font-size: 1.3em;">${riskLevel}</strong><br>
+         ${predictionText}<br>
+         <small>Risk Score: ${Math.round(riskPercentage)}%</small>`;
+    
+    // Debug output
+    console.log('Vibration:', vibration, 'Temp:', temperature, 'RPM:', rotorSpeed);
+    console.log('Risk Percentage:', riskPercentage, 'Risk Level:', riskLevel);
 }
 
 // Image modal functionality
@@ -102,4 +134,7 @@ window.onload = function() {
         
     document.getElementById('rotorSpeed-value').textContent = 
         document.getElementById('rotorSpeed').value + ' RPM';
+    
+    // Set initial prediction
+    predictFailure();
 }
