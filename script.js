@@ -6,92 +6,130 @@ function scrollToSection(sectionId) {
 }
 
 // Update slider values
-document.getElementById('vibration').addEventListener('input', function() {
-    document.getElementById('vibration-value').textContent = this.value;
+document.addEventListener('DOMContentLoaded', function() {
+    // Vibration slider
+    const vibrationSlider = document.getElementById('vibration');
+    const vibrationValue = document.getElementById('vibration-value');
+    if (vibrationSlider && vibrationValue) {
+        vibrationSlider.addEventListener('input', function() {
+            vibrationValue.textContent = this.value;
+        });
+    }
+
+    // Temperature slider
+    const tempSlider = document.getElementById('temperature');
+    const tempValue = document.getElementById('temperature-value');
+    if (tempSlider && tempValue) {
+        tempSlider.addEventListener('input', function() {
+            tempValue.textContent = this.value + '°C';
+        });
+    }
+
+    // Rotor speed slider
+    const speedSlider = document.getElementById('rotorSpeed');
+    const speedValue = document.getElementById('rotorSpeed-value');
+    if (speedSlider && speedValue) {
+        speedSlider.addEventListener('input', function() {
+            speedValue.textContent = this.value + ' RPM';
+        });
+    }
+
+    // Set initial values
+    if (vibrationSlider && vibrationValue) vibrationValue.textContent = vibrationSlider.value;
+    if (tempSlider && tempValue) tempValue.textContent = tempSlider.value + '°C';
+    if (speedSlider && speedValue) speedValue.textContent = speedSlider.value + ' RPM';
 });
 
-document.getElementById('temperature').addEventListener('input', function() {
-    document.getElementById('temperature-value').textContent = this.value + '°C';
-});
-
-document.getElementById('rotorSpeed').addEventListener('input', function() {
-    document.getElementById('rotorSpeed-value').textContent = this.value + ' RPM';
-});
-
-// GUARANTEED WORKING prediction function
+// SIMPLE GUARANTEED prediction function
 function predictFailure() {
-    const vibration = parseFloat(document.getElementById('vibration').value);
-    const temperature = parseFloat(document.getElementById('temperature').value);
-    const rotorSpeed = parseFloat(document.getElementById('rotorSpeed').value);
+    console.log("Predict function called!");
     
-    // SIMPLE DIRECT MAPPING - This will definitely work
+    // Get values with fallbacks
+    const vibration = parseFloat(document.getElementById('vibration').value) || 1.0;
+    const temperature = parseFloat(document.getElementById('temperature').value) || 85;
+    const rotorSpeed = parseFloat(document.getElementById('rotorSpeed').value) || 15;
+    
+    console.log("Values:", vibration, temperature, rotorSpeed);
+
+    // EXTREMELY SIMPLE calculation that WILL work
     let riskPercentage = 0;
     
-    // Vibration: 0.5-1.5 → 0-40%
-    riskPercentage += ((vibration - 0.5) / 1.0) * 40;
+    // Vibration contributes 0-40 points
+    riskPercentage += (vibration - 0.5) * 40; // 0.5->0%, 1.5->40%
     
-    // Temperature: 70-100 → 0-35%
-    riskPercentage += ((temperature - 70) / 30) * 35;
+    // Temperature contributes 0-35 points  
+    riskPercentage += (temperature - 70) * 1.17; // 70->0%, 100->35%
     
-    // Rotor Speed deviation: 0-5 → 0-25%
+    // Rotor speed deviation contributes 0-25 points
     const speedDeviation = Math.abs(rotorSpeed - 15);
-    riskPercentage += (speedDeviation / 5) * 25;
+    riskPercentage += speedDeviation * 5; // 0->0%, 5->25%
     
-    // Ensure we don't exceed 100%
-    riskPercentage = Math.min(100, Math.max(0, riskPercentage));
+    // Cap between 0-100
+    riskPercentage = Math.max(0, Math.min(100, riskPercentage));
     
-    // Update the risk meter
-    document.querySelector('.risk-bar').style.width = riskPercentage + '%';
-    
-    // Determine risk level with clear thresholds
-    let riskLevel, predictionText;
+    console.log("Risk percentage:", riskPercentage);
+
+    // Update risk meter
+    const riskBar = document.querySelector('.risk-bar');
+    if (riskBar) {
+        riskBar.style.width = riskPercentage + '%';
+    }
+
+    // Determine risk level
+    let riskLevel, predictionText, riskColor;
     
     if (riskPercentage >= 80) {
         riskLevel = 'CRITICAL RISK';
         predictionText = '🚨 CRITICAL FAILURE IMMINENT! Immediate shutdown required!';
-        document.querySelector('.risk-bar').style.background = 'linear-gradient(90deg, #DC2626, #B91C1C)';
-        document.getElementById('prediction-text').style.color = '#DC2626';
+        riskColor = '#DC2626';
     } 
     else if (riskPercentage >= 55) {
         riskLevel = 'HIGH RISK';
         predictionText = '⚠️ HIGH RISK! Schedule maintenance within 24 hours!';
-        document.querySelector('.risk-bar').style.background = 'linear-gradient(90deg, #EA580C, #C2410C)';
-        document.getElementById('prediction-text').style.color = '#EA580C';
+        riskColor = '#EA580C';
     }
     else if (riskPercentage >= 30) {
         riskLevel = 'MODERATE RISK';
         predictionText = 'ℹ️ Moderate issues detected. Schedule inspection soon.';
-        document.querySelector('.risk-bar').style.background = 'linear-gradient(90deg, #F59E0B, #D97706)';
-        document.getElementById('prediction-text').style.color = '#F59E0B';
+        riskColor = '#F59E0B';
     }
     else {
         riskLevel = 'LOW RISK';
         predictionText = '✅ All systems normal. No action required.';
-        document.querySelector('.risk-bar').style.background = 'linear-gradient(90deg, #10B981, #059669)';
-        document.getElementById('prediction-text').style.color = '#10B981';
+        riskColor = '#10B981';
     }
-    
-    // Update the prediction text
-    document.getElementById('prediction-text').innerHTML = 
-        `<strong style="font-size: 1.3em;">${riskLevel}</strong><br>
-         ${predictionText}<br>
-         <small>Risk Score: ${Math.round(riskPercentage)}%</small>`;
-    
-    // Debug output
-    console.log('Vibration:', vibration, 'Temp:', temperature, 'RPM:', rotorSpeed);
-    console.log('Risk Percentage:', riskPercentage, 'Risk Level:', riskLevel);
+
+    // Update risk bar color
+    if (riskBar) {
+        riskBar.style.background = riskColor;
+    }
+
+    // Update prediction text
+    const predictionElement = document.getElementById('prediction-text');
+    if (predictionElement) {
+        predictionElement.innerHTML = 
+            `<strong style="font-size: 1.3em; color: ${riskColor}">${riskLevel}</strong><br>
+             ${predictionText}<br>
+             <small>Risk Score: ${Math.round(riskPercentage)}%</small>`;
+        predictionElement.style.color = riskColor;
+    }
 }
 
 // Image modal functionality
 function openModal(element) {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
-    modal.style.display = 'block';
-    modalImg.src = element.src;
+    if (modal && modalImg) {
+        modal.style.display = 'block';
+        modalImg.src = element.src;
+    }
 }
 
 function closeModal() {
-    document.getElementById('imageModal').style.display = 'none';
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 // Close modal when clicking outside
@@ -123,18 +161,23 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Initialize page
-window.onload = function() {
-    // Set initial values for sliders
-    document.getElementById('vibration-value').textContent = 
-        document.getElementById('vibration').value;
+// Test function to verify it's working
+function testRiskLevels() {
+    console.log("Testing risk levels...");
     
-    document.getElementById('temperature-value').textContent = 
-        document.getElementById('temperature').value + '°C';
-        
-    document.getElementById('rotorSpeed-value').textContent = 
-        document.getElementById('rotorSpeed').value + ' RPM';
+    // Test CRITICAL RISK
+    document.getElementById('vibration').value = 1.5;
+    document.getElementById('temperature').value = 100;
+    document.getElementById('rotorSpeed').value = 20;
     
-    // Set initial prediction
+    // Update display values
+    document.getElementById('vibration-value').textContent = '1.5';
+    document.getElementById('temperature-value').textContent = '100°C';
+    document.getElementById('rotorSpeed-value').textContent = '20 RPM';
+    
+    // Run prediction
     predictFailure();
 }
+
+// Make test function available globally for debugging
+window.testRiskLevels = testRiskLevels;
