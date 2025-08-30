@@ -18,7 +18,7 @@ document.getElementById('rotorSpeed').addEventListener('input', function() {
     document.getElementById('rotorSpeed-value').textContent = this.value + ' RPM';
 });
 
-// SIMPLIFIED and GUARANTEED prediction function
+// ---- FIXED prediction function ----
 function predictFailure() {
     const vibration = parseFloat(document.getElementById('vibration').value);
     const temperature = parseFloat(document.getElementById('temperature').value);
@@ -47,32 +47,33 @@ function predictFailure() {
     else if (speedDeviation >= 1) riskPercentage += 8;  // Moderate
     else riskPercentage += 3;
 
-    // Cap at 100
+    // Cap at 100 and round
     riskPercentage = Math.min(riskPercentage, 100);
+    riskPercentage = Math.round(riskPercentage);
 
-    // --- Risk level classification ---
+    // --- Risk level classification (descending order) ---
     let predictionText = '';
     let riskLevel = '';
 
-    if (riskPercentage < 35) {
-        predictionText = 'All parameters normal. No maintenance needed.';
-        riskLevel = 'LOW RISK';
-    } else if (riskPercentage < 65) {
-        predictionText = 'Minor anomalies detected. Monitor and schedule routine check.';
-        riskLevel = 'MODERATE RISK';
-    } else if (riskPercentage < 85) {
-        predictionText = 'Significant issues detected! Schedule inspection within 48 hours.';
-        riskLevel = 'HIGH RISK';
-    } else {
+    if (riskPercentage >= 85) {
         predictionText = 'CRITICAL FAILURE IMMINENT! Shutdown and perform immediate maintenance!';
         riskLevel = 'CRITICAL RISK';
+    } else if (riskPercentage >= 65) {
+        predictionText = 'Significant issues detected! Schedule inspection within 48 hours.';
+        riskLevel = 'HIGH RISK';
+    } else if (riskPercentage >= 35) {
+        predictionText = 'Minor anomalies detected. Monitor and schedule routine check.';
+        riskLevel = 'MODERATE RISK';
+    } else {
+        predictionText = 'All parameters normal. No maintenance needed.';
+        riskLevel = 'LOW RISK';
     }
 
     // --- UI update ---
     document.querySelector('.risk-bar').style.width = riskPercentage + '%';
     document.getElementById('prediction-text').innerHTML = 
         `<strong style="font-size: 1.3em;">${riskLevel}</strong><br>${predictionText}<br>
-         <small>Risk Score: ${Math.round(riskPercentage)}%</small>`;
+         <small>Risk Score: ${riskPercentage}%</small>`;
 
     // Risk bar color
     const riskMeter = document.querySelector('.risk-bar');
